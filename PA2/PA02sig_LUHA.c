@@ -1,3 +1,7 @@
+/*
+CS 481 Programming Assignment 2
+By Luke Hanks
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -55,37 +59,3 @@ int main(int argc, char const *argv[]) {
     }
     return 0;
 }
-
-/*
-Write a program that will utilize signal handlers to
-intercept keyboard interrupts to manage control of a
-child process.
-
-- [x] Your main program should fork and exec a
-new child process to run the “yes” command (use
-man yes to learn more).
-- [x] You should then register signal
-handlers for both ctrl-c and ctrl-z in your main
-program.
-- [x] The ctrl-z signal handler should toggle the
-child yes stop the child process if it is running, or
-resume the child process if it is stopped, all while
-keeping the main program running.
-- [x] The ctrl-c signal should kill the child 
-process, and then exit the main process.
-- [x] In both signal handlers, add print statements
-indicating what the program is doing – i.e. “ctrl-z
-caught, stopping child process”.
-- [x] Your main program should sit in an infinite 
-loop once the setup has been completed.
-- [x] It should only exit when the user hits ctrl-
-c, after cleaning up the child process.
-
-Special keys are interpreted by OS as requests to send signals to the process.
-1. Ctrl-C
-    - Send signal SIGINT to the running process.
-    - By default, SIGINT causes the process to immediately terminate.
-2. Ctrl-Z
-    - send signal SIGTSTP to the running process.
-    - By default, SIGTSTP causes the process to suspend execution.
-*/
