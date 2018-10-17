@@ -2,9 +2,9 @@
 /* race.c --- for playing with ECE437                      */
 /*=========================================================*/
 #include <unistd.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <stdio.h>
 struct
 {
     int balance[2];
