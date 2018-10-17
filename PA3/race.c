@@ -1,19 +1,26 @@
 /*=========================================================*/
-/* race.c --- for playing with ECE437 */
+/* race.c --- for playing with ECE437                      */
 /*=========================================================*/
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
-struct {int balance[2];} Bank = {{100, 100}}; //global variable defined
-void *MakeTransactions() { //routine for thread execution
+struct
+{
+    int balance[2];
+} Bank = {{100, 100}}; //global variable defined
+void *MakeTransactions()
+{ //routine for thread execution
     int i, j, tmp1, tmp2, rint;
     double dummy;
-    for (i = 0; i < 100; i++) {
+    for (i = 0; i < 100; i++)
+    {
         rint = (rand() % 30) - 15;
-        if (((tmp1 = Bank.balance[0]) + rint) >= 0 && ((tmp2 = Bank.balance[1]) - rint) >= 0) {
+        if (((tmp1 = Bank.balance[0]) + rint) >= 0 && ((tmp2 = Bank.balance[1]) - rint) >= 0)
+        {
             Bank.balance[0] = tmp1 + rint;
-            for (j = 0; j < rint * 1000; j++) {
+            for (j = 0; j < rint * 1000; j++)
+            {
                 dummy = 2.345 * 8.765 / 1.234;
             } // spend time on purpose
             Bank.balance[1] = tmp2 - rint;
@@ -21,21 +28,26 @@ void *MakeTransactions() { //routine for thread execution
     }
     return NULL;
 }
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
     int i;
     void *voidptr = NULL;
     pthread_t tid[2];
     srand(getpid());
     printf("Init balances A:%d + B:%d ==> %d!\n",
            Bank.balance[0], Bank.balance[1], Bank.balance[0] + Bank.balance[1]);
-    for (i = 0; i < 2; i++) {
-        if (pthread_create(&tid[i], NULL, MakeTransactions, NULL)) {
+    for (i = 0; i < 2; i++)
+    {
+        if (pthread_create(&tid[i], NULL, MakeTransactions, NULL))
+        {
             perror("Error in thread creating\n");
             return (1);
         }
     }
-    for (i = 0; i < 2; i++) {
-        if (pthread_join(tid[i], (void *)&voidptr)) {
+    for (i = 0; i < 2; i++)
+    {
+        if (pthread_join(tid[i], (void *)&voidptr))
+        {
             perror("Error in thread joining\n");
             return (1);
         }
