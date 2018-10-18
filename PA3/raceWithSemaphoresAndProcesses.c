@@ -1,6 +1,7 @@
 /*=========================================================*/
 /* raceWithSemaphoresAndProcesses.c                        */
 /*=========================================================*/
+#include <fcntl.h>
 #include <pthread.h>
 #include <semaphore.h>
 #include <stdio.h>
@@ -41,20 +42,22 @@ int main(int argc, char** argv) {
   pthread_t tid[2];
   srand(getpid());
 
-  shmid_mutex = shmget(5678, sizeof(sem_t), IPC_CREAT | 0666);
-  if (shmid_mutex == -1) {
-    perror("Error in getting shared memory segment\n");
-    return 1;
-  }
-  shared_mutex = shmat(shmid_mutex, NULL, 0);
-  if (shared_mutex == (void*)-1) {
-    perror("Error in shared memory attach");
-    return 1;
-  }
-  if (sem_init(shared_mutex, 0, 1) == -1) {
-    perror("Error in initializing semaphore\n");
-    return 1;
-  }
+  // shmid_mutex = shmget(5678, sizeof(sem_t), IPC_CREAT | 0666);
+  // if (shmid_mutex == -1) {
+  //   perror("Error in getting shared memory segment\n");
+  //   return 1;
+  // }
+  // shared_mutex = shmat(shmid_mutex, NULL, 0);
+  // if (shared_mutex == (void*)-1) {
+  //   perror("Error in shared memory attach");
+  //   return 1;
+  // }
+  // if (sem_init(shared_mutex, 0, 1) == -1) {
+  //   perror("Error in initializing semaphore\n");
+  //   return 1;
+  // }
+
+  shared_mutex = sem_open("/empty_sem", O_CREAT, 0666, sizeof(sem_t));
 
   if ((shmid_bank = shmget(1234, 4, IPC_CREAT | 0666)) == -1) {
     perror("Error in getting shared memory segment\n");
@@ -69,10 +72,12 @@ int main(int argc, char** argv) {
   Bank->balance[1] = 100;
   printf("Init balances A:%d + B:%d ==> %d!\n", Bank->balance[0],
          Bank->balance[1], Bank->balance[0] + Bank->balance[1]);
-  if (fork() == -1) {
-    // Error
+  pid_t pid = fork();
+  if (pid == -1) {
     perror("Error in forking\n");
     return (1);
+  } else if (pid == 0) {
+    MakeTransactions();
   } else {
     MakeTransactions();
   }
