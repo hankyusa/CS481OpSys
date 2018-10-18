@@ -80,7 +80,7 @@ int main(int argc, char** argv) {
     perror("Error in shared memory detach");
     return 1;
   }
-  sem_unlink(shared_mutex);
+  sem_unlink("/mutex_sem");
   sem_destroy(shared_mutex);
   return 0;
 }
