@@ -15,8 +15,18 @@ test_race: race
 	./race
 	./race
 	./race
+	./race
+	./race
+	./race
+	./race
+	./race
 
 test_raceWithMutex: raceWithMutex
+	./raceWithMutex
+	./raceWithMutex
+	./raceWithMutex
+	./raceWithMutex
+	./raceWithMutex
 	./raceWithMutex
 	./raceWithMutex
 	./raceWithMutex
