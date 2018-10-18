@@ -8,7 +8,7 @@ raceWithMutexAndProcesses: raceWithMutexAndProcesses.c
 	gcc -pthread -o raceWithMutexAndProcesses raceWithMutexAndProcesses.c
 
 raceWithSemaphoresAndProcesses: raceWithSemaphoresAndProcesses.c
-	gcc -o raceWithSemaphoresAndProcesses raceWithSemaphoresAndProcesses.c -lrt
+	gcc -pthread -o raceWithSemaphoresAndProcesses raceWithSemaphoresAndProcesses.c -lrt
 
 test_race: race
 	./race
