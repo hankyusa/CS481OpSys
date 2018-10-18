@@ -51,7 +51,10 @@ int main(int argc, char** argv) {
     perror("Error in shared memory attach");
     return 1;
   }
-  sem_init(shared_mutex, 0, 1);
+  if (sem_init(shared_mutex, 0, 1) == -1) {
+    perror("Error in initializing semaphore\n");
+    return 1;
+  }
 
   if ((shmid_bank = shmget(1234, 4, IPC_CREAT | 0666)) == -1) {
     perror("Error in getting shared memory segment\n");
