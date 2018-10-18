@@ -1,7 +1,8 @@
 /*=========================================================*/
-/* raceWithMutexAndProcesses.c                             */
+/* raceWithSemaphoresAndProcesses.c                        */
 /*=========================================================*/
 #include <pthread.h>
+#include <semaphore.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/ipc.h>
@@ -9,7 +10,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-pthread_mutex_t shared_mutex;
+sem_t shared_mutex;
 
 struct {
   int balance[2];
@@ -20,7 +21,7 @@ void* MakeTransactions() {  // routine for thread execution
   double dummy;
   for (i = 0; i < 100; i++) {
     rint = (rand() % 30) - 15;
-    pthread_mutex_lock(&shared_mutex);
+    sem_wait(&shared_mutex);
     if (((tmp1 = Bank->balance[0]) + rint) >= 0 &&
         ((tmp2 = Bank->balance[1]) - rint) >= 0) {
       Bank->balance[0] = tmp1 + rint;
@@ -29,7 +30,7 @@ void* MakeTransactions() {  // routine for thread execution
       }  // spend time on purpose
       Bank->balance[1] = tmp2 - rint;
     }
-    pthread_mutex_unlock(&shared_mutex);
+    sem_post(&shared_mutex);
   }
   return NULL;
 }
@@ -39,7 +40,7 @@ int main(int argc, char** argv) {
   void* voidptr = NULL;
   pthread_t tid[2];
   srand(getpid());
-  pthread_mutex_init(&shared_mutex, NULL);
+  sem_init(&shared_mutex, 0, 1);
 
   if ((shmid = shmget(1234, 4, IPC_CREAT | 0666)) == -1) {
     perror("Error in getting shared memory segment\n");
@@ -68,5 +69,6 @@ int main(int argc, char** argv) {
     perror("Error in shared memory detach");
     return 1;
   }
+  sem_destroy(&shared_mutex);
   return 0;
 }

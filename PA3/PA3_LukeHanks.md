@@ -96,6 +96,150 @@ The above code always maintains a consistent sum of account balances.
 >
 >Show your implementation code in the written report, compile then run your new process-based code for 10-20 times. Write a paragraph to explain if the race condition still exists.
 
+### Code
+
+```c
+/*=========================================================*/
+/* raceWithMutexAndProcesses.c                             */
+/*=========================================================*/
+#include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+pthread_mutex_t shared_mutex;
+
+struct {
+  int balance[2];
+} * Bank;  // global variable defined
+
+void* MakeTransactions() {  // routine for thread execution
+  int i, j, tmp1, tmp2, rint;
+  double dummy;
+  for (i = 0; i < 100; i++) {
+    rint = (rand() % 30) - 15;
+    pthread_mutex_lock(&shared_mutex);
+    if (((tmp1 = Bank->balance[0]) + rint) >= 0 &&
+        ((tmp2 = Bank->balance[1]) - rint) >= 0) {
+      Bank->balance[0] = tmp1 + rint;
+      for (j = 0; j < rint * 1000; j++) {
+        dummy = 2.345 * 8.765 / 1.234;
+      }  // spend time on purpose
+      Bank->balance[1] = tmp2 - rint;
+    }
+    pthread_mutex_unlock(&shared_mutex);
+  }
+  return NULL;
+}
+
+int main(int argc, char** argv) {
+  int i, shmid;
+  void* voidptr = NULL;
+  pthread_t tid[2];
+  srand(getpid());
+  pthread_mutex_init(&shared_mutex, NULL);
+
+  if ((shmid = shmget(1234, 4, IPC_CREAT | 0666)) == -1) {
+    perror("Error in getting shared memory segment\n");
+    return 1;
+  }
+  Bank = shmat(shmid, NULL, 0);
+  if (Bank == (void*)-1) {
+    perror("Error in shared memory attach");
+    return 1;
+  }
+  Bank->balance[0] = 100;
+  Bank->balance[1] = 100;
+  printf("Init balances A:%d + B:%d ==> %d!\n", Bank->balance[0],
+         Bank->balance[1], Bank->balance[0] + Bank->balance[1]);
+  if (fork() == -1) {
+    // Error
+    perror("Error in forking\n");
+    return (1);
+  } else {
+    MakeTransactions();
+  }
+  printf("Let's check the balances A:%d + B:%d ==> %d ?= 200\n",
+         Bank->balance[0], Bank->balance[1],
+         Bank->balance[0] + Bank->balance[1]);
+  if (shmdt(Bank) == -1) {
+    perror("Error in shared memory detach");
+    return 1;
+  }
+  return 0;
+}
+```
+
+### Output
+
+```text
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:17 + B:141 ==> 158 ?= 200
+Let's check the balances A:17 + B:180 ==> 197 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:143 + B:83 ==> 226 ?= 200
+Let's check the balances A:128 + B:56 ==> 184 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:31 + B:151 ==> 182 ?= 200
+Let's check the balances A:28 + B:125 ==> 153 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:144 + B:118 ==> 262 ?= 200
+Let's check the balances A:154 + B:113 ==> 267 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:191 + B:77 ==> 268 ?= 200
+Let's check the balances A:146 + B:98 ==> 244 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:30 + B:164 ==> 194 ?= 200
+Let's check the balances A:18 + B:151 ==> 169 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:16 + B:215 ==> 231 ?= 200
+Let's check the balances A:8 + B:179 ==> 187 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:23 + B:170 ==> 193 ?= 200
+Let's check the balances A:11 + B:150 ==> 161 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:96 + B:114 ==> 210 ?= 200
+Let's check the balances A:49 + B:120 ==> 169 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:0 + B:169 ==> 169 ?= 200
+Let's check the balances A:1 + B:109 ==> 110 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:49 + B:128 ==> 177 ?= 200
+Let's check the balances A:41 + B:174 ==> 215 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:16 + B:170 ==> 186 ?= 200
+Let's check the balances A:9 + B:134 ==> 143 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:256 + B:0 ==> 256 ?= 200
+Let's check the balances A:287 + B:6 ==> 293 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:3 + B:142 ==> 145 ?= 200
+Let's check the balances A:7 + B:130 ==> 137 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:107 + B:82 ==> 189 ?= 200
+Let's check the balances A:131 + B:74 ==> 205 ?= 200
+```
+
+The race condition exists because the static `pthread_mutex_t shared_mutex` is not shared across processes, just threads.
+
 ## Question 4
 
 >Use semaphore system calls to modify your code in Q3 in order to remove any potential race conditions. Show your modification of the code and explain the outcome with your modification.
+
