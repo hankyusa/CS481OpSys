@@ -1,347 +1,34 @@
 <!DOCTYPE html>
-<html>
-
-<head>
-  <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-alpha/dist/katex.min.css" integrity="sha384-BTL0nVi8DnMrNdMQZG1Ww6yasK9ZGnUxL1ZWukXQ7fygA1py52yPp9W4wrR00VML"
-    crossorigin="anonymous">
-  <style>
-    /*--------------------------------------------------------------------------------------------- * Copyright (c) Microsoft Corporation. All rights reserved. * Licensed under the MIT License. See License.txt in the project root for license information. *--------------------------------------------------------------------------------------------*/
-    body {
-      font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
-      font-size: 14px;
-      padding: 0 26px;
-      line-height: 22px;
-      word-wrap: break-word;
-    }
-
-    #code-csp-warning {
-      position: fixed;
-      top: 0;
-      right: 0;
-      color: white;
-      margin: 16px;
-      text-align: center;
-      font-size: 12px;
-      font-family: sans-serif;
-      background-color: #444444;
-      cursor: pointer;
-      padding: 6px;
-      box-shadow: 1px 1px 1px rgba(0, 0, 0, .25);
-    }
-
-    #code-csp-warning:hover {
-      text-decoration: none;
-      background-color: #007acc;
-      box-shadow: 2px 2px 2px rgba(0, 0, 0, .25);
-    }
-
-    body.scrollBeyondLastLine {
-      margin-bottom: calc(100vh - 22px);
-    }
-
-    body.showEditorSelection .code-line {
-      position: relative;
-    }
-
-    body.showEditorSelection .code-active-line:before,
-    body.showEditorSelection .code-line:hover:before {
-      content: "";
-      display: block;
-      position: absolute;
-      top: 0;
-      left: -12px;
-      height: 100%;
-    }
-
-    body.showEditorSelection li.code-active-line:before,
-    body.showEditorSelection li.code-line:hover:before {
-      left: -30px;
-    }
-
-    .vscode-light.showEditorSelection .code-active-line:before {
-      border-left: 3px solid rgba(0, 0, 0, 0.15);
-    }
-
-    .vscode-light.showEditorSelection .code-line:hover:before {
-      border-left: 3px solid rgba(0, 0, 0, 0.40);
-    }
-
-    .vscode-light.showEditorSelection .code-line .code-line:hover:before {
-      border-left: none;
-    }
-
-    .vscode-dark.showEditorSelection .code-active-line:before {
-      border-left: 3px solid rgba(255, 255, 255, 0.4);
-    }
-
-    .vscode-dark.showEditorSelection .code-line:hover:before {
-      border-left: 3px solid rgba(255, 255, 255, 0.60);
-    }
-
-    .vscode-dark.showEditorSelection .code-line .code-line:hover:before {
-      border-left: none;
-    }
-
-    .vscode-high-contrast.showEditorSelection .code-active-line:before {
-      border-left: 3px solid rgba(255, 160, 0, 0.7);
-    }
-
-    .vscode-high-contrast.showEditorSelection .code-line:hover:before {
-      border-left: 3px solid rgba(255, 160, 0, 1);
-    }
-
-    .vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
-      border-left: none;
-    }
-
-    img {
-      max-width: 100%;
-      max-height: 100%;
-    }
-
-    a {
-      text-decoration: none;
-    }
-
-    a:hover {
-      text-decoration: underline;
-    }
-
-    a:focus,
-    input:focus,
-    select:focus,
-    textarea:focus {
-      outline: 1px solid -webkit-focus-ring-color;
-      outline-offset: -1px;
-    }
-
-    hr {
-      border: 0;
-      height: 2px;
-      border-bottom: 2px solid;
-    }
-
-    h1 {
-      padding-bottom: 0.3em;
-      line-height: 1.2;
-      border-bottom-width: 1px;
-      border-bottom-style: solid;
-    }
-
-    h1,
-    h2,
-    h3 {
-      font-weight: normal;
-    }
-
-    h1 code,
-    h2 code,
-    h3 code,
-    h4 code,
-    h5 code,
-    h6 code {
-      font-size: inherit;
-      line-height: auto;
-    }
-
-    table {
-      border-collapse: collapse;
-    }
-
-    table>thead>tr>th {
-      text-align: left;
-      border-bottom: 1px solid;
-    }
-
-    table>thead>tr>th,
-    table>thead>tr>td,
-    table>tbody>tr>th,
-    table>tbody>tr>td {
-      padding: 5px 10px;
-    }
-
-    table>tbody>tr+tr>td {
-      border-top: 1px solid;
-    }
-
-    blockquote {
-      margin: 0 7px 0 5px;
-      padding: 0 16px 0 10px;
-      border-left-width: 5px;
-      border-left-style: solid;
-    }
-
-    code {
-      font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
-      font-size: 14px;
-      line-height: 19px;
-    }
-
-    body.wordWrap pre {
-      white-space: pre-wrap;
-    }
-
-    .mac code {
-      font-size: 12px;
-      line-height: 18px;
-    }
-
-    pre:not(.hljs),
-    pre.hljs code>div {
-      padding: 16px;
-      border-radius: 3px;
-      overflow: auto;
-    }
-
-    /** Theming */
-    pre code {
-      color: var(--vscode-editor-foreground);
-    }
-
-    .vscode-light pre:not(.hljs),
-    .vscode-light code>div {
-      background-color: rgba(220, 220, 220, 0.4);
-    }
-
-    .vscode-dark pre:not(.hljs),
-    .vscode-dark code>div {
-      background-color: rgba(10, 10, 10, 0.4);
-    }
-
-    .vscode-high-contrast pre:not(.hljs),
-    .vscode-high-contrast code>div {
-      background-color: rgb(0, 0, 0);
-    }
-
-    .vscode-high-contrast h1 {
-      border-color: rgb(0, 0, 0);
-    }
-
-    .vscode-light table>thead>tr>th {
-      border-color: rgba(0, 0, 0, 0.69);
-    }
-
-    .vscode-dark table>thead>tr>th {
-      border-color: rgba(255, 255, 255, 0.69);
-    }
-
-    .vscode-light h1,
-    .vscode-light hr,
-    .vscode-light table>tbody>tr+tr>td {
-      border-color: rgba(0, 0, 0, 0.18);
-    }
-
-    .vscode-dark h1,
-    .vscode-dark hr,
-    .vscode-dark table>tbody>tr+tr>td {
-      border-color: rgba(255, 255, 255, 0.18);
-    }
-  </style>
-  <style>
-    /* Tomorrow Theme */
-    /* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
-    /* Original theme - https://github.com/chriskempson/tomorrow-theme */
-    /* Tomorrow Comment */
-    .hljs-comment,
-    .hljs-quote {
-      color: #8e908c;
-    }
-
-    /* Tomorrow Red */
-    .hljs-variable,
-    .hljs-template-variable,
-    .hljs-tag,
-    .hljs-name,
-    .hljs-selector-id,
-    .hljs-selector-class,
-    .hljs-regexp,
-    .hljs-deletion {
-      color: #c82829;
-    }
-
-    /* Tomorrow Orange */
-    .hljs-number,
-    .hljs-built_in,
-    .hljs-builtin-name,
-    .hljs-literal,
-    .hljs-type,
-    .hljs-params,
-    .hljs-meta,
-    .hljs-link {
-      color: #f5871f;
-    }
-
-    /* Tomorrow Yellow */
-    .hljs-attribute {
-      color: #eab700;
-    }
-
-    /* Tomorrow Green */
-    .hljs-string,
-    .hljs-symbol,
-    .hljs-bullet,
-    .hljs-addition {
-      color: #718c00;
-    }
-
-    /* Tomorrow Blue */
-    .hljs-title,
-    .hljs-section {
-      color: #4271ae;
-    }
-
-    /* Tomorrow Purple */
-    .hljs-keyword,
-    .hljs-selector-tag {
-      color: #8959a8;
-    }
-
-    .hljs {
-      display: block;
-      overflow-x: auto;
-      color: #4d4d4c;
-      padding: 0.5em;
-    }
-
-    .hljs-emphasis {
-      font-style: italic;
-    }
-
-    .hljs-strong {
-      font-weight: bold;
-    }
-  </style>
-  <style>
-    .task-list-item {
-      list-style-type: none;
-    }
-
-    .task-list-item-checkbox {
-      margin-left: -20px;
-      vertical-align: middle;
-    }
-  </style>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', 'HelveticaNeue-Light', 'Ubuntu', 'Droid Sans', sans-serif;
-      font-size: 14px;
-      line-height: 1.2;
-    }
-  </style>
-</head>
-
-<body>
-  <h1 id="programming-assignment-03">Programming Assignment 03</h1>
-  <p>by Luke Hanks</p>
-  <h2 id="question-1">Question 1</h2>
-  <blockquote>
-    <p>Compile then run the above code for 10-20 times. Write a paragraph to explain.</p>
-  </blockquote>
-  <p><code>void* MakeTransactions()</code> makes 100 random transactions under $15 between accounts A and B. The sum of
-    the account balances should not change. But they do change. To understand why consider the following possible (and
-    likely given that dummy for-loop) order of value assignments.</p>
-  <pre class="hljs"><code><div><span class="hljs-comment">//          Thread 0                       Thread 1</span>
+    <html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0-alpha/dist/katex.min.css" integrity="sha384-BTL0nVi8DnMrNdMQZG1Ww6yasK9ZGnUxL1ZWukXQ7fygA1py52yPp9W4wrR00VML" crossorigin="anonymous">
+        <style>
+/*--------------------------------------------------------------------------------------------- * Copyright (c) Microsoft Corporation. All rights reserved. * Licensed under the MIT License. See License.txt in the project root for license information. *--------------------------------------------------------------------------------------------*/ body { font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback"; font-size: 14px; padding: 0 26px; line-height: 22px; word-wrap: break-word; } #code-csp-warning { position: fixed; top: 0; right: 0; color: white; margin: 16px; text-align: center; font-size: 12px; font-family: sans-serif; background-color:#444444; cursor: pointer; padding: 6px; box-shadow: 1px 1px 1px rgba(0,0,0,.25); } #code-csp-warning:hover { text-decoration: none; background-color:#007acc; box-shadow: 2px 2px 2px rgba(0,0,0,.25); } body.scrollBeyondLastLine { margin-bottom: calc(100vh - 22px); } body.showEditorSelection .code-line { position: relative; } body.showEditorSelection .code-active-line:before, body.showEditorSelection .code-line:hover:before { content: ""; display: block; position: absolute; top: 0; left: -12px; height: 100%; } body.showEditorSelection li.code-active-line:before, body.showEditorSelection li.code-line:hover:before { left: -30px; } .vscode-light.showEditorSelection .code-active-line:before { border-left: 3px solid rgba(0, 0, 0, 0.15); } .vscode-light.showEditorSelection .code-line:hover:before { border-left: 3px solid rgba(0, 0, 0, 0.40); } .vscode-light.showEditorSelection .code-line .code-line:hover:before { border-left: none; } .vscode-dark.showEditorSelection .code-active-line:before { border-left: 3px solid rgba(255, 255, 255, 0.4); } .vscode-dark.showEditorSelection .code-line:hover:before { border-left: 3px solid rgba(255, 255, 255, 0.60); } .vscode-dark.showEditorSelection .code-line .code-line:hover:before { border-left: none; } .vscode-high-contrast.showEditorSelection .code-active-line:before { border-left: 3px solid rgba(255, 160, 0, 0.7); } .vscode-high-contrast.showEditorSelection .code-line:hover:before { border-left: 3px solid rgba(255, 160, 0, 1); } .vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before { border-left: none; } img { max-width: 100%; max-height: 100%; } a { text-decoration: none; } a:hover { text-decoration: underline; } a:focus, input:focus, select:focus, textarea:focus { outline: 1px solid -webkit-focus-ring-color; outline-offset: -1px; } hr { border: 0; height: 2px; border-bottom: 2px solid; } h1 { padding-bottom: 0.3em; line-height: 1.2; border-bottom-width: 1px; border-bottom-style: solid; } h1, h2, h3 { font-weight: normal; } h1 code, h2 code, h3 code, h4 code, h5 code, h6 code { font-size: inherit; line-height: auto; } table { border-collapse: collapse; } table > thead > tr > th { text-align: left; border-bottom: 1px solid; } table > thead > tr > th, table > thead > tr > td, table > tbody > tr > th, table > tbody > tr > td { padding: 5px 10px; } table > tbody > tr + tr > td { border-top: 1px solid; } blockquote { margin: 0 7px 0 5px; padding: 0 16px 0 10px; border-left-width: 5px; border-left-style: solid; } code { font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback"; font-size: 14px; line-height: 19px; } body.wordWrap pre { white-space: pre-wrap; } .mac code { font-size: 12px; line-height: 18px; } pre:not(.hljs), pre.hljs code > div { padding: 16px; border-radius: 3px; overflow: auto; } /** Theming */ pre code { color: var(--vscode-editor-foreground); } .vscode-light pre:not(.hljs), .vscode-light code > div { background-color: rgba(220, 220, 220, 0.4); } .vscode-dark pre:not(.hljs), .vscode-dark code > div { background-color: rgba(10, 10, 10, 0.4); } .vscode-high-contrast pre:not(.hljs), .vscode-high-contrast code > div { background-color: rgb(0, 0, 0); } .vscode-high-contrast h1 { border-color: rgb(0, 0, 0); } .vscode-light table > thead > tr > th { border-color: rgba(0, 0, 0, 0.69); } .vscode-dark table > thead > tr > th { border-color: rgba(255, 255, 255, 0.69); } .vscode-light h1, .vscode-light hr, .vscode-light table > tbody > tr + tr > td { border-color: rgba(0, 0, 0, 0.18); } .vscode-dark h1, .vscode-dark hr, .vscode-dark table > tbody > tr + tr > td { border-color: rgba(255, 255, 255, 0.18); } 
+</style>
+<style>
+/* Tomorrow Theme */ /* http://jmblog.github.com/color-themes-for-google-code-highlightjs */ /* Original theme - https://github.com/chriskempson/tomorrow-theme */ /* Tomorrow Comment */ .hljs-comment, .hljs-quote { color: #8e908c; } /* Tomorrow Red */ .hljs-variable, .hljs-template-variable, .hljs-tag, .hljs-name, .hljs-selector-id, .hljs-selector-class, .hljs-regexp, .hljs-deletion { color: #c82829; } /* Tomorrow Orange */ .hljs-number, .hljs-built_in, .hljs-builtin-name, .hljs-literal, .hljs-type, .hljs-params, .hljs-meta, .hljs-link { color: #f5871f; } /* Tomorrow Yellow */ .hljs-attribute { color: #eab700; } /* Tomorrow Green */ .hljs-string, .hljs-symbol, .hljs-bullet, .hljs-addition { color: #718c00; } /* Tomorrow Blue */ .hljs-title, .hljs-section { color: #4271ae; } /* Tomorrow Purple */ .hljs-keyword, .hljs-selector-tag { color: #8959a8; } .hljs { display: block; overflow-x: auto; color: #4d4d4c; padding: 0.5em; } .hljs-emphasis { font-style: italic; } .hljs-strong { font-weight: bold; }
+</style>
+<style>
+.task-list-item { list-style-type: none; } .task-list-item-checkbox { margin-left: -20px; vertical-align: middle; }
+</style>
+        <style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', 'HelveticaNeue-Light', 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.2;
+            }
+        </style>
+    </head>
+    <body>
+        <h1 id="programming-assignment-03">Programming Assignment 03</h1>
+<p>by Luke Hanks</p>
+<h2 id="question-1">Question 1</h2>
+<blockquote>
+<p>Compile then run the above code for 10-20 times. Write a paragraph to explain.</p>
+</blockquote>
+<p><code>void* MakeTransactions()</code> makes 100 random transactions under $15 between accounts A and B. The sum of the account balances should not change. But they do change. To understand why consider the following possible (and likely given that dummy for-loop) order of value assignments.</p>
+<pre class="hljs"><code><div><span class="hljs-comment">//          Thread 0                       Thread 1</span>
 Bank.balance[<span class="hljs-number">0</span>] = tmp1 + rint
                                         tmp1 = Bank.balance[<span class="hljs-number">0</span>]
                                         tmp2 = Bank.balance[<span class="hljs-number">1</span>]
@@ -349,15 +36,12 @@ Bank.balance[<span class="hljs-number">0</span>] = tmp1 + rint
 Bank.balance[<span class="hljs-number">1</span>] = tmp2 - rint
                                         Bank.balance[<span class="hljs-number">1</span>] = tmp2 - rint
 </div></code></pre>
-  <p>Thread 1's <code>temp1</code> value would reflect Thread 0's partially completed transaction, but Thread 1's <code>temp2</code>
-    value would would not. This will result in Thread 0's effect on <code>Bank.balance[1]</code> being undone, but not
-    Thread 0's effect on <code>Bank.balance[0]</code>. Money will appear to vanish and materialize at random.</p>
-  <h2 id="question-2">Question 2</h2>
-  <blockquote>
-    <p>Use thread library calls (mutex lock and unlock) to modify the code in Q1) to remove any potential race
-      conditions. Show your modification of the code and explain the outcome with your modification.</p>
-  </blockquote>
-  <pre class="hljs"><code><div><span class="hljs-comment">/*=========================================================*/</span>
+<p>Thread 1's <code>temp1</code> value would reflect Thread 0's partially completed transaction, but Thread 1's <code>temp2</code> value would would not. This will result in Thread 0's effect on <code>Bank.balance[1]</code> being undone, but not Thread 0's  effect on <code>Bank.balance[0]</code>. Money will appear to vanish and materialize at random.</p>
+<h2 id="question-2">Question 2</h2>
+<blockquote>
+<p>Use thread library calls (mutex lock and unlock) to modify the code in Q1) to remove any potential race conditions. Show your modification of the code and explain the outcome with your modification.</p>
+</blockquote>
+<pre class="hljs"><code><div><span class="hljs-comment">/*=========================================================*/</span>
 <span class="hljs-comment">/* raceWithMutex.c                                         */</span>
 <span class="hljs-comment">/*=========================================================*/</span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;pthread.h&gt;</span></span>
@@ -413,29 +97,20 @@ Bank.balance[<span class="hljs-number">1</span>] = tmp2 - rint
   <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
 }
 </div></code></pre>
-  <p>The above code always maintains a consistent sum of account balances.</p>
-  <p><code>shared_mutex</code> is a static variable so all the threads share it. The first thread to call <code>pthread_mutex_lock(&amp;shared_mutex)</code>
-    locks <code>shared_mutex</code> and executes its transaction. While that transaction is happening, the second
-    thread to call <code>pthread_mutex_lock(&amp;shared_mutex)</code> waits for <code>shared_mutex</code> to be
-    unlocked. After the first thread finishes its transaction, it calls <code>pthread_mutex_unlock(&amp;shared_mutex)</code>
-    which unlocks <code>shared_mutex</code>. The second thread which has been waiting immediately locks <code>shared_mutex</code>
-    and does its transaction.</p>
-  <h2 id="question-3">Question 3</h2>
-  <blockquote>
-    <p>Rewrite your code in Q1) replacing threads by processes.</p>
-    <ul>
-      <li>Instead of creating two threads to call “MakeTransactions”, you will use fork() to create a child process.
-        Both parent and child processes will call procedure “MakeTransactions”.</li>
-      <li>Since two processes will not share a common address space, you will need to rewrite code to allocate “Bank”
-        as a shared variable (by applying shared memory IPC, see Slide M02c).</li>
-      <li>Other parts (i.e., set up initial values, print the initial values and balance, and print the ending values
-        and balance) stay the same.</li>
-    </ul>
-    <p>Show your implementation code in the written report, compile then run your new process-based code for 10-20
-      times. Write a paragraph to explain if the race condition still exists.</p>
-  </blockquote>
-  <h3 id="code">Code</h3>
-  <pre class="hljs"><code><div><span class="hljs-comment">/*=========================================================*/</span>
+<p>The above code always maintains a consistent sum of account balances.</p>
+<p><code>shared_mutex</code> is a static variable so all the threads share it. The first thread to call <code>pthread_mutex_lock(&amp;shared_mutex)</code> locks <code>shared_mutex</code> and executes its transaction. While that transaction is happening, the second thread to call <code>pthread_mutex_lock(&amp;shared_mutex)</code> waits for <code>shared_mutex</code> to be unlocked. After the first thread finishes its transaction, it calls <code>pthread_mutex_unlock(&amp;shared_mutex)</code> which unlocks <code>shared_mutex</code>. The second thread which has been waiting immediately locks <code>shared_mutex</code> and does its transaction.</p>
+<h2 id="question-3">Question 3</h2>
+<blockquote>
+<p>Rewrite your code in Q1) replacing threads by processes.</p>
+<ul>
+<li>Instead of creating two threads to call “MakeTransactions”, you will use fork() to create a child process. Both parent and child processes will call procedure “MakeTransactions”.</li>
+<li>Since two processes will not share a common address space, you will need to rewrite code to allocate “Bank” as a shared variable (by applying shared memory IPC, see Slide M02c).</li>
+<li>Other parts (i.e., set up initial values, print the initial values and balance, and print the ending values and balance) stay the same.</li>
+</ul>
+<p>Show your implementation code in the written report, compile then run your new process-based code for 10-20 times. Write a paragraph to explain if the race condition still exists.</p>
+</blockquote>
+<h3 id="code">Code</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/*=========================================================*/</span>
 <span class="hljs-comment">/* raceWithMutexAndProcesses.c                             */</span>
 <span class="hljs-comment">/*=========================================================*/</span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;pthread.h&gt;</span></span>
@@ -508,8 +183,8 @@ Bank.balance[<span class="hljs-number">1</span>] = tmp2 - rint
   <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
 }
 </div></code></pre>
-  <h3 id="output">Output</h3>
-  <pre><code class="language-text">Init balances A:100 + B:100 ==> 200!
+<h3 id="output">Output</h3>
+<pre><code class="language-text">Init balances A:100 + B:100 ==> 200!
 Let's check the balances A:17 + B:141 ==> 158 ?= 200
 Let's check the balances A:17 + B:180 ==> 197 ?= 200
 
@@ -569,15 +244,13 @@ Init balances A:100 + B:100 ==> 200!
 Let's check the balances A:107 + B:82 ==> 189 ?= 200
 Let's check the balances A:131 + B:74 ==> 205 ?= 200
 </code></pre>
-  <p>The race condition exists because the static <code>pthread_mutex_t shared_mutex</code> is not shared across
-    processes, just threads.</p>
-  <h2 id="question-4">Question 4</h2>
-  <blockquote>
-    <p>Use semaphore system calls to modify your code in Q3 in order to remove any potential race conditions. Show your
-      modification of the code and explain the outcome with your modification.</p>
-  </blockquote>
-  <h3 id="code">Code</h3>
-  <pre class="hljs"><code><div><span class="hljs-comment">/*=========================================================*/</span>
+<p>The race condition exists because the static <code>pthread_mutex_t shared_mutex</code> is not shared across processes, just threads.</p>
+<h2 id="question-4">Question 4</h2>
+<blockquote>
+<p>Use semaphore system calls to modify your code in Q3 in order to remove any potential race conditions. Show your modification of the code and explain the outcome with your modification.</p>
+</blockquote>
+<h3 id="code">Code</h3>
+<pre class="hljs"><code><div><span class="hljs-comment">/*=========================================================*/</span>
 <span class="hljs-comment">/* raceWithSemaphoresAndProcesses.c                        */</span>
 <span class="hljs-comment">/*=========================================================*/</span>
 <span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;fcntl.h&gt;</span></span>
@@ -659,72 +332,72 @@ Let's check the balances A:131 + B:74 ==> 205 ?= 200
     perror(<span class="hljs-string">"Error in shared memory detach"</span>);
     <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
   }
+  sem_unlink(shared_mutex);
   sem_destroy(shared_mutex);
   <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
 }
 </div></code></pre>
-  <h3 id="output">Output</h3>
-  <pre><code class="language-text">Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:169 + B:31 ==> 200 ?= 200
-Let's check the balances A:183 + B:17 ==> 200 ?= 200
+<h3 id="output">Output</h3>
+<pre><code class="language-text">Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:185 + B:15 ==> 200 ?= 200
+Let's check the balances A:196 + B:4 ==> 200 ?= 200
 
 Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:17 + B:183 ==> 200 ?= 200
+Let's check the balances A:14 + B:186 ==> 200 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:117 + B:83 ==> 200 ?= 200
+Let's check the balances A:94 + B:106 ==> 200 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:10 + B:190 ==> 200 ?= 200
 Let's check the balances A:12 + B:188 ==> 200 ?= 200
-Let's check the balances A:8 + B:192 ==> 200 ?= 200
 
 Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:88 + B:112 ==> 200 ?= 200
-Let's check the balances A:159 + B:41 ==> 200 ?= 200
-
-Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:112 + B:88 ==> 200 ?= 200
-Let's check the balances A:74 + B:126 ==> 200 ?= 200
-
-Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:109 + B:98 ==> 207 ?= 200
-Let's check the balances A:134 + B:66 ==> 200 ?= 200
-
-Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:38 + B:162 ==> 200 ?= 200
-Let's check the balances A:30 + B:170 ==> 200 ?= 200
-
-Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:178 + B:22 ==> 200 ?= 200
-Let's check the balances A:167 + B:33 ==> 200 ?= 200
-
-Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:62 + B:138 ==> 200 ?= 200
-Let's check the balances A:58 + B:142 ==> 200 ?= 200
-
-Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:1 + B:199 ==> 200 ?= 200
 Let's check the balances A:3 + B:197 ==> 200 ?= 200
+Let's check the balances A:2 + B:198 ==> 200 ?= 200
 
 Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:91 + B:109 ==> 200 ?= 200
-Let's check the balances A:154 + B:46 ==> 200 ?= 200
+Let's check the balances A:144 + B:56 ==> 200 ?= 200
+Let's check the balances A:128 + B:72 ==> 200 ?= 200
 
 Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:104 + B:96 ==> 200 ?= 200
-Let's check the balances A:89 + B:111 ==> 200 ?= 200
-
-Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:47 + B:165 ==> 212 ?= 200
-Let's check the balances A:32 + B:168 ==> 200 ?= 200
-
-Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:9 + B:191 ==> 200 ?= 200
-Let's check the balances A:0 + B:200 ==> 200 ?= 200
+Let's check the balances A:190 + B:10 ==> 200 ?= 200
+Let's check the balances A:197 + B:3 ==> 200 ?= 200
 
 Init balances A:100 + B:100 ==> 200!
 Let's check the balances A:13 + B:187 ==> 200 ?= 200
-Let's check the balances A:26 + B:174 ==> 200 ?= 200
+Let's check the balances A:5 + B:195 ==> 200 ?= 200
 
 Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:49 + B:151 ==> 200 ?= 200
-Let's check the balances A:51 + B:149 ==> 200 ?= 200
+Let's check the balances A:57 + B:143 ==> 200 ?= 200
+Let's check the balances A:83 + B:117 ==> 200 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:36 + B:164 ==> 200 ?= 200
+Let's check the balances A:65 + B:135 ==> 200 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:1 + B:199 ==> 200 ?= 200
+Let's check the balances A:8 + B:192 ==> 200 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:74 + B:126 ==> 200 ?= 200
+Let's check the balances A:54 + B:146 ==> 200 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:125 + B:75 ==> 200 ?= 200
+Let's check the balances A:173 + B:27 ==> 200 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:93 + B:107 ==> 200 ?= 200
+Let's check the balances A:104 + B:96 ==> 200 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:91 + B:109 ==> 200 ?= 200
+Let's check the balances A:15 + B:185 ==> 200 ?= 200
 </code></pre>
 
-</body>
-
-</html>
+    </body>
+    </html>

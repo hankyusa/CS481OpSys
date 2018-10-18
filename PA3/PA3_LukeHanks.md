@@ -338,62 +338,62 @@ int main(int argc, char** argv) {
 
 ```text
 Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:169 + B:31 ==> 200 ?= 200
-Let's check the balances A:183 + B:17 ==> 200 ?= 200
+Let's check the balances A:185 + B:15 ==> 200 ?= 200
+Let's check the balances A:196 + B:4 ==> 200 ?= 200
 
 Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:17 + B:183 ==> 200 ?= 200
+Let's check the balances A:14 + B:186 ==> 200 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:117 + B:83 ==> 200 ?= 200
+Let's check the balances A:94 + B:106 ==> 200 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:10 + B:190 ==> 200 ?= 200
 Let's check the balances A:12 + B:188 ==> 200 ?= 200
-Let's check the balances A:8 + B:192 ==> 200 ?= 200
 
 Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:88 + B:112 ==> 200 ?= 200
-Let's check the balances A:159 + B:41 ==> 200 ?= 200
-
-Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:112 + B:88 ==> 200 ?= 200
-Let's check the balances A:74 + B:126 ==> 200 ?= 200
-
-Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:109 + B:98 ==> 207 ?= 200
-Let's check the balances A:134 + B:66 ==> 200 ?= 200
-
-Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:38 + B:162 ==> 200 ?= 200
-Let's check the balances A:30 + B:170 ==> 200 ?= 200
-
-Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:178 + B:22 ==> 200 ?= 200
-Let's check the balances A:167 + B:33 ==> 200 ?= 200
-
-Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:62 + B:138 ==> 200 ?= 200
-Let's check the balances A:58 + B:142 ==> 200 ?= 200
-
-Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:1 + B:199 ==> 200 ?= 200
 Let's check the balances A:3 + B:197 ==> 200 ?= 200
+Let's check the balances A:2 + B:198 ==> 200 ?= 200
 
 Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:91 + B:109 ==> 200 ?= 200
-Let's check the balances A:154 + B:46 ==> 200 ?= 200
+Let's check the balances A:144 + B:56 ==> 200 ?= 200
+Let's check the balances A:128 + B:72 ==> 200 ?= 200
 
 Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:104 + B:96 ==> 200 ?= 200
-Let's check the balances A:89 + B:111 ==> 200 ?= 200
-
-Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:47 + B:165 ==> 212 ?= 200
-Let's check the balances A:32 + B:168 ==> 200 ?= 200
-
-Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:9 + B:191 ==> 200 ?= 200
-Let's check the balances A:0 + B:200 ==> 200 ?= 200
+Let's check the balances A:190 + B:10 ==> 200 ?= 200
+Let's check the balances A:197 + B:3 ==> 200 ?= 200
 
 Init balances A:100 + B:100 ==> 200!
 Let's check the balances A:13 + B:187 ==> 200 ?= 200
-Let's check the balances A:26 + B:174 ==> 200 ?= 200
+Let's check the balances A:5 + B:195 ==> 200 ?= 200
 
 Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:49 + B:151 ==> 200 ?= 200
-Let's check the balances A:51 + B:149 ==> 200 ?= 200
+Let's check the balances A:57 + B:143 ==> 200 ?= 200
+Let's check the balances A:83 + B:117 ==> 200 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:36 + B:164 ==> 200 ?= 200
+Let's check the balances A:65 + B:135 ==> 200 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:1 + B:199 ==> 200 ?= 200
+Let's check the balances A:8 + B:192 ==> 200 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:74 + B:126 ==> 200 ?= 200
+Let's check the balances A:54 + B:146 ==> 200 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:125 + B:75 ==> 200 ?= 200
+Let's check the balances A:173 + B:27 ==> 200 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:93 + B:107 ==> 200 ?= 200
+Let's check the balances A:104 + B:96 ==> 200 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:91 + B:109 ==> 200 ?= 200
+Let's check the balances A:15 + B:185 ==> 200 ?= 200
 ```
