@@ -4,12 +4,69 @@ by Luke Hanks
 
 ## Question 1
 
+>```C
+>/*=========================================================*/
+>/* race.c --- for playing with ECE437                      */
+>/*=========================================================*/
+>#include <pthread.h>
+>#include <stdio.h>
+>#include <stdlib.h>
+>#include <unistd.h>
+>
+>struct {
+>  int balance[2];
+>} Bank = {{100, 100}};  // global variable defined
+>
+>void* MakeTransactions() {  // routine for thread execution
+>  int i, j, tmp1, tmp2, rint;
+>  double dummy;
+>  for (i = 0; i < 100; i++) {
+>    rint = (rand() % 30) - 15;
+>    if (((tmp1 = Bank.balance[0]) + rint) >= 0 &&
+>        ((tmp2 = Bank.balance[1]) - rint) >= 0) {
+>      Bank.balance[0] = tmp1 + rint;
+>      for (j = 0; j < rint * 1000; j++) {
+>        dummy = 2.345 * 8.765 / 1.234;
+>      }  // spend time on purpose
+>      Bank.balance[1] = tmp2 - rint;
+>    }
+>  }
+>  return NULL;
+>}
+>
+>int main(int argc, char** argv) {
+>  int i;
+>  void* voidptr = NULL;
+>  pthread_t tid[2];
+>  srand(getpid());
+>  printf("Init balances A:%d + B:%d ==> %d!\n", Bank.balance[0],
+>         Bank.balance[1], Bank.balance[0] + Bank.balance[1]);
+>  for (i = 0; i < 2; i++) {
+>    if (pthread_create(&tid[i], NULL, MakeTransactions, NULL)) {
+>      perror("Error in thread creating\n");
+>      return (1);
+>    }
+>  }
+>  for (i = 0; i < 2; i++) {
+>    if (pthread_join(tid[i], (void*)&voidptr)) {
+>      perror("Error in thread joining\n");
+>      return (1);
+>    }
+>  }
+>  printf("Let's check the balances A:%d + B:%d ==> %d ?= 200\n",
+>         Bank.balance[0], Bank.balance[1], Bank.balance[0] + Bank.balance[1]);
+>  return 0;
+>}
+>```
+>
 >Compile then run the above code for 10-20 times. Write a paragraph to explain.
 
-`void* MakeTransactions()` makes 100 random transactions under $15 between accounts A and B. The sum of the account balances should not change. But they do change. To understand why consider the following possible (and likely given that dummy for-loop) order of value assignments.
+`void* MakeTransactions()` makes 100 random transactions under $15 between accounts A and B. The sum of the account balances should not change. But they do change. To understand why consider the following possible (and likely given that dummy for-loop) order of value assignments. Keep in mind that `Bank` is shared, but `temp1` and `temp2` are not.
 
 ```c
 //          Thread 0                       Thread 1
+tmp1 = Bank.balance[0]
+tmp2 = Bank.balance[1]
 Bank.balance[0] = tmp1 + rint
                                         tmp1 = Bank.balance[0]
                                         tmp2 = Bank.balance[1]
@@ -76,9 +133,11 @@ int main(int argc, char** argv) {
       return (1);
     }
   }
+  pthread_mutex_lock(&shared_mutex); //                       <-- MODIFICATION
   printf("Let's check the balances A:%d + B:%d ==> %d ?= 200\n",
          Bank.balance[0], Bank.balance[1], Bank.balance[0] + Bank.balance[1]);
   return 0;
+  pthread_mutex_unlock(&shared_mutex); //                     <-- MODIFICATION
 }
 ```
 
@@ -155,16 +214,21 @@ int main(int argc, char** argv) {
   Bank->balance[1] = 100;
   printf("Init balances A:%d + B:%d ==> %d!\n", Bank->balance[0],
          Bank->balance[1], Bank->balance[0] + Bank->balance[1]);
-  if (fork() == -1) {
+  pid_t pid = fork();
+  if (pid < 0) {
     // Error
     perror("Error in forking\n");
     return (1);
+  } else if (pid == 0) {
+    MakeTransactions();
   } else {
     MakeTransactions();
+    pthread_mutex_lock(&shared_mutex);
+    printf("Let's check the balances A:%d + B:%d ==> %d ?= 200\n",
+           Bank->balance[0], Bank->balance[1],
+           Bank->balance[0] + Bank->balance[1]);
+    pthread_mutex_unlock(&shared_mutex);
   }
-  printf("Let's check the balances A:%d + B:%d ==> %d ?= 200\n",
-         Bank->balance[0], Bank->balance[1],
-         Bank->balance[0] + Bank->balance[1]);
   if (shmdt(Bank) == -1) {
     perror("Error in shared memory detach");
     return 1;
@@ -176,65 +240,66 @@ int main(int argc, char** argv) {
 ### Output
 
 ```text
+./raceWithMutexAndProcesses
 Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:17 + B:141 ==> 158 ?= 200
-Let's check the balances A:17 + B:180 ==> 197 ?= 200
-
+Let's check the balances A:25 + B:157 ==> 182 ?= 200
+./raceWithMutexAndProcesses
 Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:143 + B:83 ==> 226 ?= 200
-Let's check the balances A:128 + B:56 ==> 184 ?= 200
-
+Let's check the balances A:1 + B:205 ==> 206 ?= 200
+./raceWithMutexAndProcesses
 Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:31 + B:151 ==> 182 ?= 200
-Let's check the balances A:28 + B:125 ==> 153 ?= 200
-
+Let's check the balances A:187 + B:61 ==> 248 ?= 200
+./raceWithMutexAndProcesses
 Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:144 + B:118 ==> 262 ?= 200
-Let's check the balances A:154 + B:113 ==> 267 ?= 200
-
+Let's check the balances A:118 + B:140 ==> 258 ?= 200
+./raceWithMutexAndProcesses
 Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:191 + B:77 ==> 268 ?= 200
-Let's check the balances A:146 + B:98 ==> 244 ?= 200
-
+Let's check the balances A:156 + B:94 ==> 250 ?= 200
+./raceWithMutexAndProcesses
 Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:30 + B:164 ==> 194 ?= 200
-Let's check the balances A:18 + B:151 ==> 169 ?= 200
-
+Let's check the balances A:64 + B:97 ==> 161 ?= 200
+./raceWithMutexAndProcesses
 Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:16 + B:215 ==> 231 ?= 200
-Let's check the balances A:8 + B:179 ==> 187 ?= 200
-
+Let's check the balances A:30 + B:139 ==> 169 ?= 200
+./raceWithMutexAndProcesses
 Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:23 + B:170 ==> 193 ?= 200
-Let's check the balances A:11 + B:150 ==> 161 ?= 200
-
+Let's check the balances A:101 + B:116 ==> 217 ?= 200
+./raceWithMutexAndProcesses
 Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:96 + B:114 ==> 210 ?= 200
-Let's check the balances A:49 + B:120 ==> 169 ?= 200
-
+Let's check the balances A:8 + B:221 ==> 229 ?= 200
+./raceWithMutexAndProcesses
 Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:0 + B:169 ==> 169 ?= 200
-Let's check the balances A:1 + B:109 ==> 110 ?= 200
-
+Let's check the balances A:204 + B:79 ==> 283 ?= 200
+./raceWithMutexAndProcesses
 Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:49 + B:128 ==> 177 ?= 200
-Let's check the balances A:41 + B:174 ==> 215 ?= 200
-
+Let's check the balances A:14 + B:156 ==> 170 ?= 200
+./raceWithMutexAndProcesses
 Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:16 + B:170 ==> 186 ?= 200
-Let's check the balances A:9 + B:134 ==> 143 ?= 200
-
+Let's check the balances A:41 + B:172 ==> 213 ?= 200
+./raceWithMutexAndProcesses
 Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:256 + B:0 ==> 256 ?= 200
-Let's check the balances A:287 + B:6 ==> 293 ?= 200
-
+Let's check the balances A:288 + B:3 ==> 291 ?= 200
+./raceWithMutexAndProcesses
 Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:3 + B:142 ==> 145 ?= 200
-Let's check the balances A:7 + B:130 ==> 137 ?= 200
-
+Let's check the balances A:17 + B:176 ==> 193 ?= 200
+./raceWithMutexAndProcesses
 Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:107 + B:82 ==> 189 ?= 200
-Let's check the balances A:131 + B:74 ==> 205 ?= 200
+Let's check the balances A:9 + B:164 ==> 173 ?= 200
+./raceWithMutexAndProcesses
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:25 + B:195 ==> 220 ?= 200
+./raceWithMutexAndProcesses
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:296 + B:29 ==> 325 ?= 200
+./raceWithMutexAndProcesses
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:220 + B:59 ==> 279 ?= 200
+./raceWithMutexAndProcesses
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:141 + B:92 ==> 233 ?= 200
+./raceWithMutexAndProcesses
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:233 + B:38 ==> 271 ?= 200
 ```
 
 The race condition exists because the static `pthread_mutex_t shared_mutex` is not shared across processes, just threads.
@@ -320,80 +385,90 @@ int main(int argc, char** argv) {
   } else {
     shared_mutex = sem_open("/mutex_sem", O_RDWR);
     MakeTransactions();
+    if (sem_wait(shared_mutex) < 0) {
+      perror("Error in sem_wait()");
+    }
+    printf("Let's check the balances A:%d + B:%d ==> %d ?= 200\n",
+           Bank->balance[0], Bank->balance[1],
+           Bank->balance[0] + Bank->balance[1]);
+    while (sem_post(shared_mutex) < 0) {
+      perror("Error in sem_post()");
+    }
   }
-  printf("Let's check the balances A:%d + B:%d ==> %d ?= 200\n",
-         Bank->balance[0], Bank->balance[1],
-         Bank->balance[0] + Bank->balance[1]);
+
   if (shmdt(Bank) < 0) {
     perror("Error in shared memory detach");
     return 1;
   }
-  sem_unlink(shared_mutex);
+  sem_unlink("/mutex_sem");
   sem_destroy(shared_mutex);
   return 0;
 }
+
 ```
 
 ### Output
 
 ```text
-Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:185 + B:15 ==> 200 ?= 200
-Let's check the balances A:196 + B:4 ==> 200 ?= 200
 
+./raceWithSemaphoresAndProcesses
 Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:17 + B:183 ==> 200 ?= 200
-Let's check the balances A:14 + B:186 ==> 200 ?= 200
-
+Let's check the balances A:25 + B:175 ==> 200 ?= 200
+./raceWithSemaphoresAndProcesses
 Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:117 + B:83 ==> 200 ?= 200
-Let's check the balances A:94 + B:106 ==> 200 ?= 200
-
-Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:10 + B:190 ==> 200 ?= 200
-Let's check the balances A:12 + B:188 ==> 200 ?= 200
-
-Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:3 + B:197 ==> 200 ?= 200
-Let's check the balances A:2 + B:198 ==> 200 ?= 200
-
-Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:144 + B:56 ==> 200 ?= 200
-Let's check the balances A:128 + B:72 ==> 200 ?= 200
-
-Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:190 + B:10 ==> 200 ?= 200
-Let's check the balances A:197 + B:3 ==> 200 ?= 200
-
+Let's check the balances A:4 + B:196 ==> 200 ?= 200
+./raceWithSemaphoresAndProcesses
 Init balances A:100 + B:100 ==> 200!
 Let's check the balances A:13 + B:187 ==> 200 ?= 200
+./raceWithSemaphoresAndProcesses
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:137 + B:63 ==> 200 ?= 200
+./raceWithSemaphoresAndProcesses
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:38 + B:162 ==> 200 ?= 200
+./raceWithSemaphoresAndProcesses
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:30 + B:170 ==> 200 ?= 200
+./raceWithSemaphoresAndProcesses
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:26 + B:174 ==> 200 ?= 200
+./raceWithSemaphoresAndProcesses
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:197 + B:3 ==> 200 ?= 200
+./raceWithSemaphoresAndProcesses
+Init balances A:100 + B:100 ==> 200!
 Let's check the balances A:5 + B:195 ==> 200 ?= 200
-
+./raceWithSemaphoresAndProcesses
 Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:57 + B:143 ==> 200 ?= 200
-Let's check the balances A:83 + B:117 ==> 200 ?= 200
-
+Let's check the balances A:103 + B:97 ==> 200 ?= 200
+./raceWithSemaphoresAndProcesses
 Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:36 + B:164 ==> 200 ?= 200
-Let's check the balances A:65 + B:135 ==> 200 ?= 200
-
+Let's check the balances A:52 + B:148 ==> 200 ?= 200
+./raceWithSemaphoresAndProcesses
 Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:1 + B:199 ==> 200 ?= 200
-Let's check the balances A:8 + B:192 ==> 200 ?= 200
-
+Let's check the balances A:174 + B:26 ==> 200 ?= 200
+./raceWithSemaphoresAndProcesses
 Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:74 + B:126 ==> 200 ?= 200
-Let's check the balances A:54 + B:146 ==> 200 ?= 200
-
+Let's check the balances A:22 + B:178 ==> 200 ?= 200
+./raceWithSemaphoresAndProcesses
 Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:125 + B:75 ==> 200 ?= 200
-Let's check the balances A:173 + B:27 ==> 200 ?= 200
-
+Let's check the balances A:4 + B:196 ==> 200 ?= 200
+./raceWithSemaphoresAndProcesses
 Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:93 + B:107 ==> 200 ?= 200
-Let's check the balances A:104 + B:96 ==> 200 ?= 200
-
+Let's check the balances A:45 + B:155 ==> 200 ?= 200
+./raceWithSemaphoresAndProcesses
 Init balances A:100 + B:100 ==> 200!
-Let's check the balances A:91 + B:109 ==> 200 ?= 200
-Let's check the balances A:15 + B:185 ==> 200 ?= 200
+Let's check the balances A:61 + B:139 ==> 200 ?= 200
+./raceWithSemaphoresAndProcesses
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:158 + B:42 ==> 200 ?= 200
+./raceWithSemaphoresAndProcesses
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:121 + B:79 ==> 200 ?= 200
+./raceWithSemaphoresAndProcesses
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:18 + B:182 ==> 200 ?= 200
+./raceWithSemaphoresAndProcesses
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:97 + B:103 ==> 200 ?= 200
 ```
