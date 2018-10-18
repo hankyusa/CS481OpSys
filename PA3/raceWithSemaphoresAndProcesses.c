@@ -10,7 +10,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-sem_t shared_mutex;
+sem_t* shared_mutex;
 
 struct {
   int balance[2];
@@ -21,7 +21,7 @@ void* MakeTransactions() {  // routine for thread execution
   double dummy;
   for (i = 0; i < 100; i++) {
     rint = (rand() % 30) - 15;
-    sem_wait(&shared_mutex);
+    sem_wait(shared_mutex);
     if (((tmp1 = Bank->balance[0]) + rint) >= 0 &&
         ((tmp2 = Bank->balance[1]) - rint) >= 0) {
       Bank->balance[0] = tmp1 + rint;
@@ -30,23 +30,34 @@ void* MakeTransactions() {  // routine for thread execution
       }  // spend time on purpose
       Bank->balance[1] = tmp2 - rint;
     }
-    sem_post(&shared_mutex);
+    sem_post(shared_mutex);
   }
   return NULL;
 }
 
 int main(int argc, char** argv) {
-  int i, shmid;
+  int i, shmid_bank, shmid_mutex;
   void* voidptr = NULL;
   pthread_t tid[2];
   srand(getpid());
-  sem_init(&shared_mutex, 0, 1);
 
-  if ((shmid = shmget(1234, 4, IPC_CREAT | 0666)) == -1) {
+  shmid_mutex = shmget(5678, sizeof(sem_t), IPC_CREAT | 0666);
+  if (shmid_mutex == -1) {
     perror("Error in getting shared memory segment\n");
     return 1;
   }
-  Bank = shmat(shmid, NULL, 0);
+  shared_mutex = shmat(shmid_mutex, NULL, 0);
+  if (shared_mutex == (void*)-1) {
+    perror("Error in shared memory attach");
+    return 1;
+  }
+  sem_init(shared_mutex, 0, 1);
+
+  if ((shmid_bank = shmget(1234, 4, IPC_CREAT | 0666)) == -1) {
+    perror("Error in getting shared memory segment\n");
+    return 1;
+  }
+  Bank = shmat(shmid_bank, NULL, 0);
   if (Bank == (void*)-1) {
     perror("Error in shared memory attach");
     return 1;
