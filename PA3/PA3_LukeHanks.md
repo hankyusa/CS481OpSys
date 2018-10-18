@@ -82,7 +82,9 @@ int main(int argc, char** argv) {
 }
 ```
 
-The above code always maintains a consistent sum of account balances. `shared_mutex` is a static variable so all the threads share it. The first thread to call `pthread_mutex_lock(&shared_mutex)` locks `shared_mutex` and executes its transaction. While that transaction is happening, the second thread to call `pthread_mutex_lock(&shared_mutex)` waits for `shared_mutex` to be unlocked. After the first thread finishes its transaction, it calls `pthread_mutex_unlock(&shared_mutex)` which unlocks `shared_mutex`. The second thread which has been waiting immediately locks `shared_mutex` and does its transaction.
+The above code always maintains a consistent sum of account balances.
+
+`shared_mutex` is a static variable so all the threads share it. The first thread to call `pthread_mutex_lock(&shared_mutex)` locks `shared_mutex` and executes its transaction. While that transaction is happening, the second thread to call `pthread_mutex_lock(&shared_mutex)` waits for `shared_mutex` to be unlocked. After the first thread finishes its transaction, it calls `pthread_mutex_unlock(&shared_mutex)` which unlocks `shared_mutex`. The second thread which has been waiting immediately locks `shared_mutex` and does its transaction.
 
 ## Question 3
 

@@ -4,6 +4,9 @@ race: race.c
 raceWithMutex: raceWithMutex.c
 	gcc -pthread -o raceWithMutex raceWithMutex.c
 
+raceWithMutexAndProcesses: raceWithMutexAndProcesses.c
+	gcc -pthread -o raceWithMutexAndProcesses raceWithMutexAndProcesses.c
+
 test_race: race
 	./race
 	./race
@@ -37,3 +40,20 @@ test_raceWithMutex: raceWithMutex
 	./raceWithMutex
 	./raceWithMutex
 	./raceWithMutex
+
+test_raceWithMutexAndProcesses: raceWithMutexAndProcesses
+	./raceWithMutexAndProcesses
+	./raceWithMutexAndProcesses
+	./raceWithMutexAndProcesses
+	./raceWithMutexAndProcesses
+	./raceWithMutexAndProcesses
+	./raceWithMutexAndProcesses
+	./raceWithMutexAndProcesses
+	./raceWithMutexAndProcesses
+	./raceWithMutexAndProcesses
+	./raceWithMutexAndProcesses
+	./raceWithMutexAndProcesses
+	./raceWithMutexAndProcesses
+	./raceWithMutexAndProcesses
+	./raceWithMutexAndProcesses
+	./raceWithMutexAndProcesses
