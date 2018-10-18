@@ -14,6 +14,9 @@ raceWithMutexAndProcesses: raceWithMutexAndProcesses.c
 raceWithSemaphoresAndProcesses: raceWithSemaphoresAndProcesses.c
 	gcc -pthread -o raceWithSemaphoresAndProcesses raceWithSemaphoresAndProcesses.c -lrt
 
+clean: 
+	$(RM) race raceWithMutex raceWithMutexAndProcesses raceWithSemaphoresAndProcesses
+
 test_race: race
 	./race
 	./race
