@@ -243,3 +243,157 @@ The race condition exists because the static `pthread_mutex_t shared_mutex` is n
 
 >Use semaphore system calls to modify your code in Q3 in order to remove any potential race conditions. Show your modification of the code and explain the outcome with your modification.
 
+### Code
+
+```c
+/*=========================================================*/
+/* raceWithSemaphoresAndProcesses.c                        */
+/*=========================================================*/
+#include <fcntl.h>
+#include <pthread.h>
+#include <semaphore.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+sem_t* shared_mutex;
+
+struct {
+  int balance[2];
+} * Bank;  // global variable defined
+
+void* MakeTransactions() {  // routine for thread execution
+  int i, j, tmp1, tmp2, rint;
+  double dummy;
+  for (i = 0; i < 100; i++) {
+    rint = (rand() % 30) - 15;
+    if (sem_wait(shared_mutex) < 0) {
+      perror("Error in sem_wait()");
+      continue;
+    }
+    if (((tmp1 = Bank->balance[0]) + rint) >= 0 &&
+        ((tmp2 = Bank->balance[1]) - rint) >= 0) {
+      Bank->balance[0] = tmp1 + rint;
+      for (j = 0; j < rint * 1000; j++) {
+        dummy = 2.345 * 8.765 / 1.234;
+      }  // spend time on purpose
+      Bank->balance[1] = tmp2 - rint;
+    }
+    while (sem_post(shared_mutex) < 0) {
+      perror("Error in sem_post()");
+    }
+  }
+  return NULL;
+}
+
+int main(int argc, char** argv) {
+  int i, shmid_bank, shmid_mutex;
+  void* voidptr = NULL;
+  pthread_t tid[2];
+  srand(getpid());
+
+  shared_mutex = sem_open("/mutex_sem", O_CREAT, 0666, 1);
+
+  if ((shmid_bank = shmget(1234, 4, IPC_CREAT | 0666)) < 0) {
+    perror("Error in getting shared memory segment\n");
+    return 1;
+  }
+  Bank = shmat(shmid_bank, NULL, 0);
+  if (Bank == (void*)-1) {
+    perror("Error in shared memory attach");
+    return 1;
+  }
+  Bank->balance[0] = 100;
+  Bank->balance[1] = 100;
+  printf("Init balances A:%d + B:%d ==> %d!\n", Bank->balance[0],
+         Bank->balance[1], Bank->balance[0] + Bank->balance[1]);
+  pid_t pid = fork();
+  if (pid < 0) {
+    perror("Error in forking\n");
+    return (1);
+  } else if (pid == 0) {
+    shared_mutex = sem_open("/mutex_sem", O_RDWR);
+    MakeTransactions();
+  } else {
+    shared_mutex = sem_open("/mutex_sem", O_RDWR);
+    MakeTransactions();
+  }
+  printf("Let's check the balances A:%d + B:%d ==> %d ?= 200\n",
+         Bank->balance[0], Bank->balance[1],
+         Bank->balance[0] + Bank->balance[1]);
+  if (shmdt(Bank) < 0) {
+    perror("Error in shared memory detach");
+    return 1;
+  }
+  sem_unlink(shared_mutex);
+  sem_destroy(shared_mutex);
+  return 0;
+}
+```
+
+### Output
+
+```text
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:169 + B:31 ==> 200 ?= 200
+Let's check the balances A:183 + B:17 ==> 200 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:12 + B:188 ==> 200 ?= 200
+Let's check the balances A:8 + B:192 ==> 200 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:88 + B:112 ==> 200 ?= 200
+Let's check the balances A:159 + B:41 ==> 200 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:112 + B:88 ==> 200 ?= 200
+Let's check the balances A:74 + B:126 ==> 200 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:109 + B:98 ==> 207 ?= 200
+Let's check the balances A:134 + B:66 ==> 200 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:38 + B:162 ==> 200 ?= 200
+Let's check the balances A:30 + B:170 ==> 200 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:178 + B:22 ==> 200 ?= 200
+Let's check the balances A:167 + B:33 ==> 200 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:62 + B:138 ==> 200 ?= 200
+Let's check the balances A:58 + B:142 ==> 200 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:1 + B:199 ==> 200 ?= 200
+Let's check the balances A:3 + B:197 ==> 200 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:91 + B:109 ==> 200 ?= 200
+Let's check the balances A:154 + B:46 ==> 200 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:104 + B:96 ==> 200 ?= 200
+Let's check the balances A:89 + B:111 ==> 200 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:47 + B:165 ==> 212 ?= 200
+Let's check the balances A:32 + B:168 ==> 200 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:9 + B:191 ==> 200 ?= 200
+Let's check the balances A:0 + B:200 ==> 200 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:13 + B:187 ==> 200 ?= 200
+Let's check the balances A:26 + B:174 ==> 200 ?= 200
+
+Init balances A:100 + B:100 ==> 200!
+Let's check the balances A:49 + B:151 ==> 200 ?= 200
+Let's check the balances A:51 + B:149 ==> 200 ?= 200
+```

@@ -47,20 +47,6 @@ int main(int argc, char** argv) {
   pthread_t tid[2];
   srand(getpid());
 
-  // shmid_mutex = shmget(5678, sizeof(sem_t), IPC_CREAT | 0666);
-  // if (shmid_mutex < 0) {
-  //   perror("Error in getting shared memory segment\n");
-  //   return 1;
-  // }
-  // shared_mutex = shmat(shmid_mutex, NULL, 0);
-  // if (shared_mutex == (void*)-1) {
-  //   perror("Error in shared memory attach");
-  //   return 1;
-  // }
-  // if (sem_init(shared_mutex, 0, 1) < 0) {
-  //   perror("Error in initializing semaphore\n");
-  //   return 1;
-  // }
   shared_mutex = sem_open("/mutex_sem", O_CREAT, 0666, 1);
 
   if ((shmid_bank = shmget(1234, 4, IPC_CREAT | 0666)) < 0) {
@@ -94,6 +80,7 @@ int main(int argc, char** argv) {
     perror("Error in shared memory detach");
     return 1;
   }
+  sem_unlink(shared_mutex);
   sem_destroy(shared_mutex);
   return 0;
 }
