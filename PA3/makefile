@@ -7,8 +7,8 @@ raceWithMutex: raceWithMutex.c
 raceWithMutexAndProcesses: raceWithMutexAndProcesses.c
 	gcc -pthread -o raceWithMutexAndProcesses raceWithMutexAndProcesses.c
 
-raceWithSemephoresAndProcesses: raceWithSemephoresAndProcesses.c
-	gcc -pthread -o raceWithSemephoresAndProcesses raceWithSemephoresAndProcesses.c
+raceWithSemaphoresAndProcesses: raceWithSemaphoresAndProcesses.c
+	gcc -pthread -o raceWithSemaphoresAndProcesses raceWithSemaphoresAndProcesses.c
 
 test_race: race
 	./race
@@ -61,19 +61,19 @@ test_raceWithMutexAndProcesses: raceWithMutexAndProcesses
 	./raceWithMutexAndProcesses
 	./raceWithMutexAndProcesses
 
-test_raceWithSemephoresAndProcesses: raceWithSemephoresAndProcesses
-	./raceWithSemephoresAndProcesses
-	./raceWithSemephoresAndProcesses
-	./raceWithSemephoresAndProcesses
-	./raceWithSemephoresAndProcesses
-	./raceWithSemephoresAndProcesses
-	./raceWithSemephoresAndProcesses
-	./raceWithSemephoresAndProcesses
-	./raceWithSemephoresAndProcesses
-	./raceWithSemephoresAndProcesses
-	./raceWithSemephoresAndProcesses
-	./raceWithSemephoresAndProcesses
-	./raceWithSemephoresAndProcesses
-	./raceWithSemephoresAndProcesses
-	./raceWithSemephoresAndProcesses
-	./raceWithSemephoresAndProcesses
+test_raceWithSemaphoresAndProcesses: raceWithSemaphoresAndProcesses
+	./raceWithSemaphoresAndProcesses
+	./raceWithSemaphoresAndProcesses
+	./raceWithSemaphoresAndProcesses
+	./raceWithSemaphoresAndProcesses
+	./raceWithSemaphoresAndProcesses
+	./raceWithSemaphoresAndProcesses
+	./raceWithSemaphoresAndProcesses
+	./raceWithSemaphoresAndProcesses
+	./raceWithSemaphoresAndProcesses
+	./raceWithSemaphoresAndProcesses
+	./raceWithSemaphoresAndProcesses
+	./raceWithSemaphoresAndProcesses
+	./raceWithSemaphoresAndProcesses
+	./raceWithSemaphoresAndProcesses
+	./raceWithSemaphoresAndProcesses
