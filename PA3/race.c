@@ -15,7 +15,6 @@ void* MakeTransactions() {  // routine for thread execution
   double dummy;
   for (i = 0; i < 100; i++) {
     rint = (rand() % 30) - 15;
-    printf("Transaction amount = %d", rint);
     if (((tmp1 = Bank.balance[0]) + rint) >= 0 &&
         ((tmp2 = Bank.balance[1]) - rint) >= 0) {
       Bank.balance[0] = tmp1 + rint;
