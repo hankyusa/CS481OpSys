@@ -72,10 +72,17 @@ int main(int argc, char** argv) {
   } else {
     shared_mutex = sem_open("/mutex_sem", O_RDWR);
     MakeTransactions();
+    if (sem_wait(shared_mutex) < 0) {
+      perror("Error in sem_wait()");
+    }
+    printf("Let's check the balances A:%d + B:%d ==> %d ?= 200\n",
+           Bank->balance[0], Bank->balance[1],
+           Bank->balance[0] + Bank->balance[1]);
+    while (sem_post(shared_mutex) < 0) {
+      perror("Error in sem_post()");
+    }
   }
-  printf("Let's check the balances A:%d + B:%d ==> %d ?= 200\n",
-         Bank->balance[0], Bank->balance[1],
-         Bank->balance[0] + Bank->balance[1]);
+
   if (shmdt(Bank) < 0) {
     perror("Error in shared memory detach");
     return 1;

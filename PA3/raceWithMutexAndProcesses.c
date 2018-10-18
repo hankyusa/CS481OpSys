@@ -54,16 +54,21 @@ int main(int argc, char** argv) {
   Bank->balance[1] = 100;
   printf("Init balances A:%d + B:%d ==> %d!\n", Bank->balance[0],
          Bank->balance[1], Bank->balance[0] + Bank->balance[1]);
-  if (fork() == -1) {
+  pid_t pid = fork();
+  if (pid < 0) {
     // Error
     perror("Error in forking\n");
     return (1);
+  } else if (pid == 0) {
+    MakeTransactions();
   } else {
     MakeTransactions();
+    pthread_mutex_lock(&shared_mutex);
+    printf("Let's check the balances A:%d + B:%d ==> %d ?= 200\n",
+           Bank->balance[0], Bank->balance[1],
+           Bank->balance[0] + Bank->balance[1]);
+    pthread_mutex_unlock(&shared_mutex);
   }
-  printf("Let's check the balances A:%d + B:%d ==> %d ?= 200\n",
-         Bank->balance[0], Bank->balance[1],
-         Bank->balance[0] + Bank->balance[1]);
   if (shmdt(Bank) == -1) {
     perror("Error in shared memory detach");
     return 1;

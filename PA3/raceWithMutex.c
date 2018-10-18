@@ -51,7 +51,9 @@ int main(int argc, char** argv) {
       return (1);
     }
   }
+  pthread_mutex_lock(&shared_mutex);
   printf("Let's check the balances A:%d + B:%d ==> %d ?= 200\n",
          Bank.balance[0], Bank.balance[1], Bank.balance[0] + Bank.balance[1]);
   return 0;
+  pthread_mutex_unlock(&shared_mutex);
 }
