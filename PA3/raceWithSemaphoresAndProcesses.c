@@ -22,7 +22,10 @@ void* MakeTransactions() {  // routine for thread execution
   double dummy;
   for (i = 0; i < 100; i++) {
     rint = (rand() % 30) - 15;
-    sem_wait(shared_mutex);
+    if (sem_wait(shared_mutex) < 0) {
+      perror("Error in sem_wait()");
+      continue;
+    }
     if (((tmp1 = Bank->balance[0]) + rint) >= 0 &&
         ((tmp2 = Bank->balance[1]) - rint) >= 0) {
       Bank->balance[0] = tmp1 + rint;
@@ -31,7 +34,9 @@ void* MakeTransactions() {  // routine for thread execution
       }  // spend time on purpose
       Bank->balance[1] = tmp2 - rint;
     }
-    sem_post(shared_mutex);
+    while (sem_post(shared_mutex) < 0) {
+      perror("Error in sem_post()");
+    }
   }
   return NULL;
 }
@@ -43,7 +48,7 @@ int main(int argc, char** argv) {
   srand(getpid());
 
   // shmid_mutex = shmget(5678, sizeof(sem_t), IPC_CREAT | 0666);
-  // if (shmid_mutex == -1) {
+  // if (shmid_mutex < 0) {
   //   perror("Error in getting shared memory segment\n");
   //   return 1;
   // }
@@ -52,14 +57,13 @@ int main(int argc, char** argv) {
   //   perror("Error in shared memory attach");
   //   return 1;
   // }
-  // if (sem_init(shared_mutex, 0, 1) == -1) {
+  // if (sem_init(shared_mutex, 0, 1) < 0) {
   //   perror("Error in initializing semaphore\n");
   //   return 1;
   // }
+  shared_mutex = sem_open("/mutex_sem", O_CREAT, 0666, 1);
 
-  shared_mutex = sem_open("/empty_sem", O_CREAT, 0666, sizeof(sem_t));
-
-  if ((shmid_bank = shmget(1234, 4, IPC_CREAT | 0666)) == -1) {
+  if ((shmid_bank = shmget(1234, 4, IPC_CREAT | 0666)) < 0) {
     perror("Error in getting shared memory segment\n");
     return 1;
   }
@@ -73,18 +77,20 @@ int main(int argc, char** argv) {
   printf("Init balances A:%d + B:%d ==> %d!\n", Bank->balance[0],
          Bank->balance[1], Bank->balance[0] + Bank->balance[1]);
   pid_t pid = fork();
-  if (pid == -1) {
+  if (pid < 0) {
     perror("Error in forking\n");
     return (1);
   } else if (pid == 0) {
+    shared_mutex = sem_open("/mutex_sem", O_RDWR);
     MakeTransactions();
   } else {
+    shared_mutex = sem_open("/mutex_sem", O_RDWR);
     MakeTransactions();
   }
   printf("Let's check the balances A:%d + B:%d ==> %d ?= 200\n",
          Bank->balance[0], Bank->balance[1],
          Bank->balance[0] + Bank->balance[1]);
-  if (shmdt(Bank) == -1) {
+  if (shmdt(Bank) < 0) {
     perror("Error in shared memory detach");
     return 1;
   }
