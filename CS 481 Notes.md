@@ -10,12 +10,12 @@ Computer from bottom to top:
 
 - Hardware
 - Firmware (on read-only memory (ROM))
-    + Basic input output system (BIOS) or Unified Extensible Firmware Interface (UEFI)
+  - Basic input output system (BIOS) or Unified Extensible Firmware Interface (UEFI)
 - CMOS (BIOS settings and clock)
 - Device drivers
 - Operating system
-    + Kernel
-    + Utilities
+  - Kernel
+  - Utilities
 - Applications/User
 
 TODO Memorize, the first task of the BIOS is Power-on self-test (POST). See L1S11.
